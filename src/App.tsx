@@ -30,6 +30,461 @@ const SOUTH_AFRICAN_LANGUAGES = [
   { code: 'nr', name: 'isiNdebele', native: 'isiNdebele' }
 ];
 
+// Translation data for South African languages
+const TRANSLATIONS = {
+  en: {
+    // Navigation & UI
+    newChat: 'New Chat',
+    settings: 'Settings',
+    export: 'Export',
+    search: 'Search conversations...',
+    favorites: 'Favorites',
+    home: 'Home',
+    
+    // Ruby Introduction
+    hiRuby: "Hi! I'm Ruby",
+    rubyDescription: "Your AI tutor for Grades 8-12. I'm here to help you excel in all subjects with personalized support in any of South Africa's 11 official languages.",
+    
+    // Grades & Subjects
+    grade: 'Grade',
+    subjects: 'Subjects',
+    chooseSubject: 'Choose a subject to access past 5 years of exam papers for download',
+    examPapers: 'Exam Papers',
+    downloadPapers: 'Download past exam papers (2019-2023) to practice and prepare',
+    pastPapersAvailable: 'Past Papers Available',
+    downloadPdf: 'Download PDF',
+    pages: 'pages',
+    
+    // Subjects
+    mathematics: 'Mathematics',
+    english: 'English',
+    sciences: 'Sciences',
+    languages: 'Languages',
+    
+    // Education Phases
+    seniorPhase: 'Senior Phase',
+    fetPhase: 'FET Phase',
+    matricYear: 'Matric Year',
+    
+    // Chat
+    askRuby: 'Ask Ruby anything in',
+    rubyHelp: 'Ruby can help with homework, explain concepts, and provide study support for Grades 8-12',
+    
+    // Other
+    you: 'You'
+  },
+  af: {
+    // Navigation & UI
+    newChat: 'Nuwe Gesprek',
+    settings: 'Instellings',
+    export: 'Uitvoer',
+    search: 'Soek gesprekke...',
+    favorites: 'Gunstelinge',
+    home: 'Tuis',
+    
+    // Ruby Introduction
+    hiRuby: "Hallo! Ek is Ruby",
+    rubyDescription: "Jou KI-tutor vir Graad 8-12. Ek is hier om jou te help uitblink in alle vakke met persoonlike ondersteuning in enige van Suid-Afrika se 11 amptelike tale.",
+    
+    // Grades & Subjects
+    grade: 'Graad',
+    subjects: 'Vakke',
+    chooseSubject: 'Kies \'n vak om toegang te kry tot die afgelope 5 jaar se eksamenvraestelle vir aflaai',
+    examPapers: 'Eksamenvraestelle',
+    downloadPapers: 'Laai afgelope eksamenvraestelle (2019-2023) af om te oefen en voor te berei',
+    pastPapersAvailable: 'Ou Vraestelle Beskikbaar',
+    downloadPdf: 'Laai PDF Af',
+    pages: 'bladsye',
+    
+    // Subjects
+    mathematics: 'Wiskunde',
+    english: 'Engels',
+    sciences: 'Wetenskappe',
+    languages: 'Tale',
+    
+    // Education Phases
+    seniorPhase: 'Senior Fase',
+    fetPhase: 'VOO Fase',
+    matricYear: 'Matriek Jaar',
+    
+    // Chat
+    askRuby: 'Vra Ruby enigiets in',
+    rubyHelp: 'Ruby kan help met huiswerk, konsepte verduidelik en studieondersteuning bied vir Graad 8-12',
+    
+    // Other
+    you: 'Jy'
+  },
+  zu: {
+    // Navigation & UI
+    newChat: 'Ingxoxo Entsha',
+    settings: 'Izilungiselelo',
+    export: 'Khipha',
+    search: 'Sesha izingxoxo...',
+    favorites: 'Izintandokazi',
+    home: 'Ikhaya',
+    
+    // Ruby Introduction
+    hiRuby: "Sawubona! NginguRuby",
+    rubyDescription: "Uthisha wakho we-AI wamabanga 8-12. Ngilapha ukusiza ukuthi uphumelele kuzo zonke izifundo ngosekelo lomuntu siqu kunoma yiluphi ulimi lwaseMzansi Afrika oluyishumi nanye olugunyaziwe.",
+    
+    // Grades & Subjects
+    grade: 'Ibanga',
+    subjects: 'Izifundo',
+    chooseSubject: 'Khetha isifundo ukuze uthole amaphepha okuhlolwa eminyakeni emi-5 edlule',
+    examPapers: 'Amaphepha Okuhlolwa',
+    downloadPapers: 'Landa amaphepha okuhlolwa adlule (2019-2023) ukuzijwayeza nokuzilungiselela',
+    pastPapersAvailable: 'Amaphepha Adlule Atholakalayo',
+    downloadPdf: 'Landa i-PDF',
+    pages: 'amakhasi',
+    
+    // Subjects
+    mathematics: 'Izibalo',
+    english: 'IsiNgisi',
+    sciences: 'Isayensi',
+    languages: 'Izilimi',
+    
+    // Education Phases
+    seniorPhase: 'Isigaba Esiphakeme',
+    fetPhase: 'Isigaba se-FET',
+    matricYear: 'Unyaka we-Matric',
+    
+    // Chat
+    askRuby: 'Buza uRuby noma yini nge',
+    rubyHelp: 'URuby angakusiza ngemisebenzi yasekhaya, achaze imiqondo, futhi anikeze usekelo lwezifundo zamabanga 8-12',
+    
+    // Other
+    you: 'Wena'
+  },
+  xh: {
+    // Navigation & UI
+    newChat: 'Incoko Entsha',
+    settings: 'Iisetingi',
+    export: 'Khupha',
+    search: 'Khangela iincoko...',
+    favorites: 'Ezithandwayo',
+    home: 'Ekhaya',
+    
+    // Ruby Introduction
+    hiRuby: "Molo! NdinguRuby",
+    rubyDescription: "Utitshala wakho we-AI wamabanga 8-12. Ndilapha ukukunceda uphumelele kuzo zonke izifundo ngenkxaso yomntu ngamnye nakweyiphi na yeelwimi ezili-11 ezisemthethweni zaseMzantsi Afrika.",
+    
+    // Grades & Subjects
+    grade: 'Ibanga',
+    subjects: 'Izifundo',
+    chooseSubject: 'Khetha isifundo ukuze ufumane amaphepha ovavanyo eminyakeni emi-5 edlulileyo',
+    examPapers: 'Amaphepha Ovavanyo',
+    downloadPapers: 'Khuphela amaphepha ovavanyo adlulileyo (2019-2023) ukuze uziqhelise kwaye ulungiselele',
+    pastPapersAvailable: 'Amaphepha Adlulileyo Afumanekayo',
+    downloadPdf: 'Khuphela i-PDF',
+    pages: 'amaphepha',
+    
+    // Subjects
+    mathematics: 'IiMathematics',
+    english: 'IsiNgesi',
+    sciences: 'IiNzululwazi',
+    languages: 'IiLwimi',
+    
+    // Education Phases
+    seniorPhase: 'Inqanaba Eliphezulu',
+    fetPhase: 'Inqanaba le-FET',
+    matricYear: 'Unyaka we-Matric',
+    
+    // Chat
+    askRuby: 'Buza uRuby nantoni na nge',
+    rubyHelp: 'URuby angakunceda ngemisebenzi yasekhaya, acacise iingcamango, kwaye anike inkxaso yokufunda yamabanga 8-12',
+    
+    // Other
+    you: 'Wena'
+  },
+  nso: {
+    // Navigation & UI
+    newChat: 'Poledišano ye Mpsha',
+    settings: 'Dipeakanyo',
+    export: 'Tšweletša',
+    search: 'Nyaka dipoledišano...',
+    favorites: 'Tše di ratiwago',
+    home: 'Gae',
+    
+    // Ruby Introduction
+    hiRuby: "Dumela! Ke Ruby",
+    rubyDescription: "Morutiši wa gago wa AI wa mephato ya 8-12. Ke mo go thušang gore o atlege ditheong tšohle ka thekgo ya motho ka noši polelong efe goba efe ya dipolelo tše 11 tša semmušo tša Afrika Borwa.",
+    
+    // Grades & Subjects
+    grade: 'Mophato',
+    subjects: 'Ditheto',
+    chooseSubject: 'Kgetha theto go hwetša maphepha a diteko a mengwaga ye 5 ye e fetilego',
+    examPapers: 'Maphepha a Diteko',
+    downloadPapers: 'Laolla maphepha a diteko a fetilego (2019-2023) go itlwaetša le go itokišetša',
+    pastPapersAvailable: 'Maphepha a Fetilego a Hwetšagala',
+    downloadPdf: 'Laolla PDF',
+    pages: 'matlakala',
+    
+    // Subjects
+    mathematics: 'Dipalo',
+    english: 'Seisemane',
+    sciences: 'Disaense',
+    languages: 'Dipolelo',
+    
+    // Education Phases
+    seniorPhase: 'Kgato ya Godimo',
+    fetPhase: 'Kgato ya FET',
+    matricYear: 'Ngwaga wa Matric',
+    
+    // Chat
+    askRuby: 'Botšiša Ruby sengwe le sengwe ka',
+    rubyHelp: 'Ruby a ka go thuša ka mešomo ya gae, a hlaloše dikgopolo, gomme a fe thekgo ya thuto ya mephato ya 8-12',
+    
+    // Other
+    you: 'Wena'
+  },
+  tn: {
+    // Navigation & UI
+    newChat: 'Puisano e Ncha',
+    settings: 'Dithulaganyo',
+    export: 'Ntsha',
+    search: 'Batla dipuisano...',
+    favorites: 'Tse di ratiwang',
+    home: 'Gae',
+    
+    // Ruby Introduction
+    hiRuby: "Dumela! Ke Ruby",
+    rubyDescription: "Morutabana wa gago wa AI wa mekgahlelo ya 8-12. Ke mo go go thusang gore o atlege mo dithutong tsotlhe ka tshegetso ya motho mongwe le mongwe mo polelong epe fela ya dipolelo tse 11 tsa semolao tsa Aforika Borwa.",
+    
+    // Grades & Subjects
+    grade: 'Mekgahlelo',
+    subjects: 'Dithuto',
+    chooseSubject: 'Tlhopha thuto go bona maphepha a ditlhatlhobo a dingwaga tse 5 tse di fetileng',
+    examPapers: 'Maphepha a Ditlhatlhobo',
+    downloadPapers: 'Laolla maphepha a ditlhatlhobo a fetileng (2019-2023) go itlwaetsa le go ipaakanyetsa',
+    pastPapersAvailable: 'Maphepha a Fetileng a Bonalang',
+    downloadPdf: 'Laolla PDF',
+    pages: 'matlakala',
+    
+    // Subjects
+    mathematics: 'Dipalo',
+    english: 'Sekgowa',
+    sciences: 'Saense',
+    languages: 'Dipolelo',
+    
+    // Education Phases
+    seniorPhase: 'Kgato e Kgolo',
+    fetPhase: 'Kgato ya FET',
+    matricYear: 'Ngwaga wa Matric',
+    
+    // Chat
+    askRuby: 'Botsa Ruby sengwe le sengwe ka',
+    rubyHelp: 'Ruby a ka go thusa ka ditiro tsa gae, a tlhalosa dikgopolo, le go neela tshegetso ya thuto ya mekgahlelo ya 8-12',
+    
+    // Other
+    you: 'Wena'
+  },
+  st: {
+    // Navigation & UI
+    newChat: 'Puisano e Ncha',
+    settings: 'Litokiso',
+    export: 'Ntsha',
+    search: 'Batla lipuisano...',
+    favorites: 'Tse ratoang',
+    home: 'Lapeng',
+    
+    // Ruby Introduction
+    hiRuby: "Dumela! Ke Ruby",
+    rubyDescription: "Morutisi wa hao wa AI wa dikereiti tsa 8-12. Ke mona ho o thusa hore o atlehe lithutong tsohle ka tšehetso ea motho ka mong polelong efe kapa efe ea maleme a 11 a molao a Afrika Borwa.",
+    
+    // Grades & Subjects
+    grade: 'Kereiti',
+    subjects: 'Lithuto',
+    chooseSubject: 'Khetha thuto ho fumana maqephe a liteko tsa lilemo tse 5 tse fetileng',
+    examPapers: 'Maqephe a Liteko',
+    downloadPapers: 'Jarolla maqephe a liteko tse fetileng (2019-2023) ho ikoetlisa le ho ipokella',
+    pastPapersAvailable: 'Maqephe a Fetileng a Fumanehang',
+    downloadPdf: 'Jarolla PDF',
+    pages: 'maqephe',
+    
+    // Subjects
+    mathematics: 'Lipalo',
+    english: 'Senyesemane',
+    sciences: 'Saense',
+    languages: 'Maleme',
+    
+    // Education Phases
+    seniorPhase: 'Mohato o Moholo',
+    fetPhase: 'Mohato oa FET',
+    matricYear: 'Selemo sa Matric',
+    
+    // Chat
+    askRuby: 'Botsa Ruby ntho efe kapa efe ka',
+    rubyHelp: 'Ruby a ka o thusa ka mesebetsi ea lapeng, a hlalosa maikutlo, le ho fana ka tšehetso ea thuto ea dikereiti tsa 8-12',
+    
+    // Other
+    you: 'Uena'
+  },
+  ss: {
+    // Navigation & UI
+    newChat: 'Inkhulumisano Lentsha',
+    settings: 'Tinhlamulo',
+    export: 'Khupha',
+    search: 'Funa tinkhulumisano...',
+    favorites: 'Letitandvwako',
+    home: 'Ekhaya',
+    
+    // Ruby Introduction
+    hiRuby: "Sawubona! NginguRuby",
+    rubyDescription: "Umfundvisi wakho we-AI wemabanga la-8-12. Ngilapha kukusita kutsi uphumelele kutonkhe tifundvo ngekusekela komuntfu ngamunye kunoma yiluphi lulwimi lwetinhlanu netishumi nanye tetemtsetfo taseNingizimu Afrika.",
+    
+    // Grades & Subjects
+    grade: 'Libanga',
+    subjects: 'Tifundvo',
+    chooseSubject: 'Khetsa sifundvo kutsi utfole emaphepha etinhlolo teminyaka le-5 ledlule',
+    examPapers: 'Emaphepha Etinhlolo',
+    downloadPapers: 'Layisha emaphepha etinhlolo ladlule (2019-2023) kutsi uticecetje futsi utilungiselele',
+    pastPapersAvailable: 'Emaphepha Ladlule Latfolakala',
+    downloadPdf: 'Layisha i-PDF',
+    pages: 'emakhasi',
+    
+    // Subjects
+    mathematics: 'Tibalo',
+    english: 'SiNgisi',
+    sciences: 'Sayensi',
+    languages: 'Tilwimi',
+    
+    // Education Phases
+    seniorPhase: 'Sigaba Lesiphakeme',
+    fetPhase: 'Sigaba se-FET',
+    matricYear: 'Umnyaka we-Matric',
+    
+    // Chat
+    askRuby: 'Butsa uRuby noma yini nge',
+    rubyHelp: 'URuby angakusita ngemisebenti yasekhaya, achaze imibono, futsi anikete lusekelo lwekufundza kwemabanga la-8-12',
+    
+    // Other
+    you: 'Wena'
+  },
+  ve: {
+    // Navigation & UI
+    newChat: 'Nyamubvudzano Muswa',
+    settings: 'Zwithulukanyo',
+    export: 'Bvisa',
+    search: 'Todani nyamubvudzano...',
+    favorites: 'Zwo funwaho',
+    home: 'Hayani',
+    
+    // Ruby Introduction
+    hiRuby: "Ndaa! Ndi Ruby",
+    rubyDescription: "Mudzulapo wanu wa AI wa gireidzi dza 8-12. Ndi hone u ni thusa uri ni kone zwikolodo zwothe nga thuso ya munwe na munwe kha luambo lufhio na lufhio lwa nyambo dzi 11 dza mulayo dza Afurika Tshipembe.",
+    
+    // Grades & Subjects
+    grade: 'Gireidzi',
+    subjects: 'Zwikolodo',
+    chooseSubject: 'Nangani tshikolodo u wana mabugu a mulingo wa minwaha i 5 yo fhelaho',
+    examPapers: 'Mabugu a Mulingo',
+    downloadPapers: 'Kanzhelani mabugu a mulingo a fhelaho (2019-2023) u kone u guda na u lugiselelwa',
+    pastPapersAvailable: 'Mabugu a Fhelaho a Wanaleaho',
+    downloadPdf: 'Kanzhela PDF',
+    pages: 'makhasi',
+    
+    // Subjects
+    mathematics: 'Mbalombalo',
+    english: 'Tshiisimane',
+    sciences: 'Sayensi',
+    languages: 'Nyambo',
+    
+    // Education Phases
+    seniorPhase: 'Tshigaba tsha Ntha',
+    fetPhase: 'Tshigaba tsha FET',
+    matricYear: 'Nwaha wa Matric',
+    
+    // Chat
+    askRuby: 'Vhudzani Ruby tshithu tshifhio na tshifhio nga',
+    rubyHelp: 'Ruby a nga ni thusa nga mishumo ya hayani, a talutshedzeni mihumbulo, na u ni nea thuso ya u guda ha gireidzi dza 8-12',
+    
+    // Other
+    you: 'Inwi'
+  },
+  ts: {
+    // Navigation & UI
+    newChat: 'Vulavurisano Bya Ntswa',
+    settings: 'Swikongomiso',
+    export: 'Humesa',
+    search: 'Lava tivulavurisano...',
+    favorites: 'Leswi rhandiwako',
+    home: 'Ekaya',
+    
+    // Ruby Introduction
+    hiRuby: "Xewani! I Ruby",
+    rubyDescription: "Mudyondzisi wa n'wina wa AI wa swiyenge swa 8-12. Ndzi laha ku n'wina pfuna leswaku mi hluvuka eka swifundo hinkwaswo hi nseketelo wa munhu hi wun'we eka ririmi rihi na rihi ra tinhlayo-nkume na yin'we ta nawu ta Afrika Dzonga.",
+    
+    // Grades & Subjects
+    grade: 'Xiyenge',
+    subjects: 'Swifundo',
+    chooseSubject: 'Hlawula xifundo ku kuma maphepha ya swikambelo swa malembe ya 5 lama hundzeke',
+    examPapers: 'Maphepha ya Swikambelo',
+    downloadPapers: 'Dawuniloda maphepha ya swikambelo lama hundzeke (2019-2023) ku tlhariha na ku tirhisela',
+    pastPapersAvailable: 'Maphepha Lama Hundzeke Lama Kumekaka',
+    downloadPdf: 'Dawuniloda PDF',
+    pages: 'matluka',
+    
+    // Subjects
+    mathematics: 'Tinhlayo',
+    english: 'Xinghezi',
+    sciences: 'Sayense',
+    languages: 'Tindzimi',
+    
+    // Education Phases
+    seniorPhase: 'Xiteji xa Le Henhla',
+    fetPhase: 'Xiteji xa FET',
+    matricYear: 'Lembe ra Matric',
+    
+    // Chat
+    askRuby: 'Vutisa Ruby nchumu wo biha hi',
+    rubyHelp: 'Ruby a nga mi pfuna hi ntirho wa le kaya, a hlamusela miehleketo, na ku nyika nseketelo wa dyondzo wa swiyenge swa 8-12',
+    
+    // Other
+    you: 'N\'wina'
+  },
+  nr: {
+    // Navigation & UI
+    newChat: 'Inkulumo Entsha',
+    settings: 'Izilungiselelo',
+    export: 'Khupha',
+    search: 'Funa izinkulumo...',
+    favorites: 'Ezithandwayo',
+    home: 'Ekhaya',
+    
+    // Ruby Introduction
+    hiRuby: "Lotjhani! NginguRuby",
+    rubyDescription: "Umfundisi wakho we-AI wamabanga 8-12. Ngilapha ukukusiza ukuthi uphumelele kuzo zonke izifundo ngosekelo lomuntu ngamunye kunoma yiluphi ulimi lwezilimi ezili-11 ezisemthethweni zaseNingizimu Afrika.",
+    
+    // Grades & Subjects
+    grade: 'Ibanga',
+    subjects: 'Izifundo',
+    chooseSubject: 'Khetha isifundo ukuze uthole amaphepha okuhlolwa eminyakeni emi-5 edlule',
+    examPapers: 'Amaphepha Okuhlolwa',
+    downloadPapers: 'Landa amaphepha okuhlolwa adlule (2019-2023) ukuzijwayeza nokuzilungiselela',
+    pastPapersAvailable: 'Amaphepha Adlule Atholakalayo',
+    downloadPdf: 'Landa i-PDF',
+    pages: 'amakhasi',
+    
+    // Subjects
+    mathematics: 'Izibalo',
+    english: 'IsiNgisi',
+    sciences: 'Isayensi',
+    languages: 'Izilimi',
+    
+    // Education Phases
+    seniorPhase: 'Isigaba Esiphakeme',
+    fetPhase: 'Isigaba se-FET',
+    matricYear: 'Unyaka we-Matric',
+    
+    // Chat
+    askRuby: 'Buza uRuby noma yini nge',
+    rubyHelp: 'URuby angakusiza ngemisebenzi yasekhaya, achaze imiqondo, futhi anikeze usekelo lwezifundo zamabanga 8-12',
+    
+    // Other
+    you: 'Wena'
+  }
+} as const;
+
 const GRADE_LEVELS = [
   { grade: 8, label: "Grade 8", description: "Senior Phase" },
   { grade: 9, label: "Grade 9", description: "Senior Phase" },
@@ -69,6 +524,12 @@ const EXAM_PAPERS: Record<number, Record<string, Array<{year: number, title: str
     EXAM_PAPERS[grade][subject] = generateExamPapers(grade, subject);
   });
 });
+
+// Translation helper function
+const t = (key: keyof typeof TRANSLATIONS.en, languageCode: string = 'en'): string => {
+  const langCode = languageCode as keyof typeof TRANSLATIONS;
+  return TRANSLATIONS[langCode]?.[key] || TRANSLATIONS.en[key];
+};
 
 function App() {
   const [conversations, setConversations] = useState<Conversation[]>([
@@ -377,7 +838,7 @@ startxref
               className="w-full bg-yellow-400 hover:bg-yellow-500 text-blue-900 font-semibold px-4 py-4 md:py-3 rounded-lg flex items-center gap-3 transition-colors text-lg md:text-base"
             >
               <Plus className="w-6 h-6 md:w-5 md:h-5" />
-              New Chat
+{t('newChat', selectedLanguage.code)}
             </button>
 
             {/* Language Selector - Sidebar */}
@@ -443,7 +904,7 @@ startxref
               <Search className="w-6 h-6 md:w-5 md:h-5 absolute left-3 top-3.5 md:top-3 text-blue-300" />
               <input
                 type="text"
-                placeholder="Search conversations..."
+                placeholder={t('search', selectedLanguage.code)}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full bg-blue-700 text-white placeholder-blue-300 pl-12 md:pl-11 pr-4 py-4 md:py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 text-lg md:text-base"
@@ -505,15 +966,15 @@ startxref
                     >
                       <Star className="w-5 h-5 md:w-4 md:h-4" />
                     </button>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        deleteConversation(conversation.id);
-                      }}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      deleteConversation(conversation.id);
+                    }}
                       className="opacity-0 group-hover:opacity-100 text-blue-300 hover:text-red-400 transition-all p-2 md:p-1"
-                    >
+                  >
                       <Trash2 className="w-5 h-5 md:w-4 md:h-4" />
-                    </button>
+                  </button>
                   </div>
                 </div>
               </div>
@@ -528,7 +989,7 @@ startxref
                 className="flex-1 bg-blue-700 hover:bg-blue-800 text-white px-3 py-4 md:py-3 rounded-lg flex items-center justify-center gap-3 transition-colors text-lg md:text-base font-semibold"
               >
                 <Settings className="w-6 h-6 md:w-5 md:h-5" />
-                Settings
+{t('settings', selectedLanguage.code)}
               </button>
               <button
                 onClick={exportChat}
@@ -536,7 +997,7 @@ startxref
                 className="flex-1 bg-blue-700 hover:bg-blue-800 disabled:opacity-50 disabled:cursor-not-allowed text-white px-3 py-4 md:py-3 rounded-lg flex items-center justify-center gap-3 transition-colors text-lg md:text-base font-semibold"
               >
                 <Download className="w-6 h-6 md:w-5 md:h-5" />
-                Export
+                {t('export', selectedLanguage.code)}
               </button>
             </div>
           </div>
@@ -599,36 +1060,36 @@ startxref
                 {currentPage === 'home' && (
                   <>
                     <div className="text-7xl md:text-8xl mb-6">🔴</div>
-                    <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">Hi! I'm Ruby</h2>
+                                        <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">{t('hiRuby', selectedLanguage.code)}</h2>
                     <p className="text-blue-100 text-xl md:text-2xl mb-8 md:mb-10 leading-relaxed font-medium">
-                      Your AI tutor for Grades 8-12. I'm here to help you excel in all subjects with personalized support in any of South Africa's 11 official languages.
+                      {t('rubyDescription', selectedLanguage.code)}
                     </p>
-                    
+                
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
                       {GRADE_LEVELS.map((gradeLevel) => (
-                        <button
+                    <button
                           key={gradeLevel.grade}
                           onClick={() => selectGrade(gradeLevel.grade)}
                           className="text-center p-6 md:p-5 bg-white/20 hover:bg-white/30 rounded-xl text-white transition-colors border-2 border-white/30 hover:border-white/50"
                         >
-                          <div className="text-3xl md:text-2xl font-bold mb-2">{gradeLevel.label}</div>
+                          <div className="text-3xl md:text-2xl font-bold mb-2">{t('grade', selectedLanguage.code)} {gradeLevel.grade}</div>
                           <div className="text-base md:text-sm text-blue-100 font-medium">{gradeLevel.description}</div>
-                        </button>
-                      ))}
-                    </div>
-                    
+                    </button>
+                  ))}
+                </div>
+                
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-8 text-blue-200 text-lg md:text-base">
                       <div className="flex items-center gap-3">
                         <Calculator className="w-7 h-7 md:w-6 md:h-6" />
-                        <span className="font-medium">Mathematics</span>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <Microscope className="w-7 h-7 md:w-6 md:h-6" />
-                        <span className="font-medium">Sciences</span>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <Languages className="w-7 h-7 md:w-6 md:h-6" />
-                        <span className="font-medium">Languages</span>
+                                            <span className="font-medium">{t('mathematics', selectedLanguage.code)}</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Microscope className="w-7 h-7 md:w-6 md:h-6" />
+                    <span className="font-medium">{t('sciences', selectedLanguage.code)}</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Languages className="w-7 h-7 md:w-6 md:h-6" />
+                    <span className="font-medium">{t('languages', selectedLanguage.code)}</span>
                       </div>
                     </div>
                   </>
@@ -643,16 +1104,16 @@ startxref
                         onClick={goHome}
                         className="text-blue-300 hover:text-white transition-colors text-lg font-medium"
                       >
-                        Home
+                        {t('home', selectedLanguage.code)}
                       </button>
                       <span className="text-blue-200 mx-3">→</span>
-                      <span className="text-white text-lg font-medium">Grade {selectedGrade}</span>
+                      <span className="text-white text-lg font-medium">{t('grade', selectedLanguage.code)} {selectedGrade}</span>
                     </div>
 
                     <div className="text-6xl md:text-7xl mb-6">📚</div>
-                    <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">Grade {selectedGrade} Subjects</h2>
+                    <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">{t('grade', selectedLanguage.code)} {selectedGrade} {t('subjects', selectedLanguage.code)}</h2>
                     <p className="text-blue-100 text-xl md:text-2xl mb-8 md:mb-10 leading-relaxed font-medium">
-                      Choose a subject to access past 5 years of exam papers for download
+                      {t('chooseSubject', selectedLanguage.code)}
                     </p>
                     
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-8">
@@ -663,7 +1124,7 @@ startxref
                           className="text-center p-6 md:p-5 bg-white/20 hover:bg-white/30 rounded-xl text-white transition-colors border-2 border-white/30 hover:border-white/50 group"
                         >
                           <div className="text-xl md:text-2xl font-bold mb-2 group-hover:text-yellow-200 transition-colors">{subject}</div>
-                          <div className="text-sm text-blue-100 font-medium">5 Past Papers Available</div>
+                          <div className="text-sm text-blue-100 font-medium">5 {t('pastPapersAvailable', selectedLanguage.code)}</div>
                         </button>
                       ))}
                     </div>
@@ -679,23 +1140,23 @@ startxref
                         onClick={goHome}
                         className="text-blue-300 hover:text-white transition-colors text-lg font-medium"
                       >
-                        Home
+                        {t('home', selectedLanguage.code)}
                       </button>
                       <span className="text-blue-200 mx-3">→</span>
                       <button
                         onClick={goBackToGrade}
                         className="text-blue-300 hover:text-white transition-colors text-lg font-medium"
                       >
-                        Grade {selectedGrade}
+                        {t('grade', selectedLanguage.code)} {selectedGrade}
                       </button>
                       <span className="text-blue-200 mx-3">→</span>
                       <span className="text-white text-lg font-medium">{selectedSubject}</span>
-                    </div>
+                  </div>
 
                     <div className="text-6xl md:text-7xl mb-6">📄</div>
-                    <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">Grade {selectedGrade} - {selectedSubject}</h2>
+                    <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">{t('grade', selectedLanguage.code)} {selectedGrade} - {selectedSubject}</h2>
                     <p className="text-blue-100 text-xl md:text-2xl mb-8 md:mb-10 leading-relaxed font-medium">
-                      Download past exam papers (2019-2023) to practice and prepare
+                      {t('downloadPapers', selectedLanguage.code)}
                     </p>
                     
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
@@ -709,18 +1170,18 @@ startxref
                             <h3 className="text-lg font-semibold text-white mb-2 group-hover:text-yellow-200 transition-colors">
                               {paper.title}
                             </h3>
-                            <div className="text-sm text-blue-200 mb-4">
-                              📄 {paper.pages} pages • 💾 {paper.size}
+                                                        <div className="text-sm text-blue-200 mb-4">
+                              📄 {paper.pages} {t('pages', selectedLanguage.code)} • 💾 {paper.size}
                             </div>
                             <button
                               onClick={() => downloadExamPaper(paper.filename, paper.title, paper.size, paper.pages)}
                               className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2"
                             >
                               <Download className="w-5 h-5" />
-                              Download PDF
+                              {t('downloadPdf', selectedLanguage.code)}
                             </button>
-                          </div>
-                        </div>
+                  </div>
+                </div>
                       )) || (
                         <div className="col-span-full text-center">
                           <p className="text-blue-200 text-lg">No exam papers available for this subject yet.</p>
@@ -762,7 +1223,7 @@ startxref
                       ? 'bg-yellow-400 text-blue-900 order-1 mr-4 md:mr-3' 
                       : 'bg-white text-blue-500 order-2 ml-4 md:ml-3'
                   }`}>
-                    {message.isUser ? 'You' : '🔴'}
+                    {message.isUser ? t('you', selectedLanguage.code) : '🔴'}
                   </div>
                 </div>
               ))}
@@ -805,7 +1266,7 @@ startxref
                   value={currentMessage}
                   onChange={(e) => setCurrentMessage(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
-                  placeholder={`Ask Ruby anything in ${selectedLanguage.native}...`}
+                  placeholder={`${t('askRuby', selectedLanguage.code)} ${selectedLanguage.native}...`}
                   className="w-full bg-white text-gray-800 placeholder-gray-500 pl-6 pr-24 py-5 md:py-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-yellow-400 text-lg md:text-base font-medium"
                   disabled={isTyping}
                 />
@@ -830,7 +1291,7 @@ startxref
             </div>
             
             <p className="text-center text-blue-200 text-lg md:text-base mt-4 md:mt-3 leading-relaxed font-medium">
-              Ruby can help with homework, explain concepts, and provide study support for Grades 8-12
+              {t('rubyHelp', selectedLanguage.code)}
             </p>
           </div>
         </div>
