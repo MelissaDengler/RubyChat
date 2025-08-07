@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Send, Plus, Menu, Settings, Download, Search, Copy, Trash2, Globe, BookOpen, Calculator, Microscope, Languages, Star } from 'lucide-react';
+import { Send, Plus, Menu, Settings, Download, Search, Copy, Trash2, Globe, BookOpen, Calculator, Microscope, Languages, Star, ArrowLeft } from 'lucide-react';
 
 interface Message {
   id: string;
@@ -515,13 +515,105 @@ const generateExamPapers = (grade: number, subject: string) => {
   }));
 };
 
-const EXAM_PAPERS: Record<number, Record<string, Array<{year: number, title: string, filename: string, size: string, pages: number}>>> = {};
+// Mock exam content generator
+const generateExamContent = (grade: number, subject: string, _year: number) => {
+  const examContent = {
+    Mathematics: {
+      sections: [
+        {
+          title: "Section A: Multiple Choice",
+          questions: [
+            "1. Solve for x: 2x + 5 = 13\na) x = 4  b) x = 6  c) x = 8  d) x = 9",
+            "2. What is the gradient of the line y = 3x - 2?\na) -2  b) 2  c) 3  d) -3",
+            "3. Factorize: x² - 9\na) (x-3)(x+3)  b) (x-9)(x+1)  c) x(x-9)  d) (x-3)²"
+          ]
+        },
+        {
+          title: "Section B: Problem Solving",
+          questions: [
+            "4. A rectangular garden has a length of 15m and width of 8m. Calculate:\na) The perimeter\nb) The area\nc) Cost of fencing at R25 per meter",
+            "5. Solve the quadratic equation: x² - 5x + 6 = 0\nShow all working steps.",
+            "6. In a right-angled triangle, sides are 3cm and 4cm.\nCalculate the hypotenuse length."
+          ]
+        }
+      ]
+    },
+    English: {
+      sections: [
+        {
+          title: "Section A: Comprehension",
+          questions: [
+            "Read the passage and answer:\n\n'The baobab tree, called the Tree of Life, is one of Africa's most iconic trees. These ancient giants can live for thousands of years and store water in their massive trunks.'\n\n1. Why is it called 'Tree of Life'?",
+            "2. How do baobab trees survive dry seasons?",
+            "3. Use 'iconic' in your own sentence."
+          ]
+        },
+        {
+          title: "Section B: Language",
+          questions: [
+            "4. Identify parts of speech:\n'The beautiful butterfly flew gracefully over the colorful garden.'",
+            "5. Write in passive voice:\na) The teacher explained the lesson.\nb) Students completed the assignment.",
+            "6. Correct errors:\n'Their going to there house after school. Its a beautiful day.'"
+          ]
+        }
+      ]
+    },
+    "Physical Sciences": {
+      sections: [
+        {
+          title: "Section A: Physics",
+          questions: [
+            "1. Calculate velocity: object travels 100m in 20 seconds.",
+            "2. Force 50N applied to 10kg object. Calculate acceleration.",
+            "3. Explain difference between speed and velocity with examples."
+          ]
+        },
+        {
+          title: "Section B: Chemistry", 
+          questions: [
+            "4. Balance equation: Na + Cl₂ → NaCl",
+            "5. Calculate molar mass of H₂O (H=1, O=16)",
+            "6. Describe neutralization reaction process."
+          ]
+        }
+      ]
+    }
+  };
+
+  const defaultContent = {
+    sections: [
+      {
+        title: "Section A: Knowledge",
+        questions: [
+          `1. Define three key concepts in ${subject}.`,
+          `2. Explain the importance of ${subject} in Grade ${grade}.`,
+          `3. Give practical examples of ${subject} in daily life.`
+        ]
+      },
+      {
+        title: "Section B: Application", 
+        questions: [
+          `4. Analyze a case study related to ${subject}.`,
+          `5. Compare two aspects of ${subject}.`,
+          `6. Evaluate impact of ${subject} on society.`
+        ]
+      }
+    ]
+  };
+
+  return examContent[subject as keyof typeof examContent] || defaultContent;
+};
+
+const EXAM_PAPERS: Record<number, Record<string, Array<{year: number, title: string, filename: string, size: string, pages: number, content: any}>>> = {};
 
 // Generate exam papers for all grades and subjects
 [8, 9, 10, 11, 12].forEach(grade => {
   EXAM_PAPERS[grade] = {};
   GRADE_SUBJECTS[grade as keyof typeof GRADE_SUBJECTS].forEach(subject => {
-    EXAM_PAPERS[grade][subject] = generateExamPapers(grade, subject);
+    EXAM_PAPERS[grade][subject] = generateExamPapers(grade, subject).map(paper => ({
+      ...paper,
+      content: generateExamContent(grade, subject, paper.year)
+    }));
   });
 });
 
@@ -565,9 +657,10 @@ function App() {
   const [sidebarLanguageMenuOpen, setSidebarLanguageMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
-  const [currentPage, setCurrentPage] = useState<'home' | 'grade' | 'subject'>('home');
+  const [currentPage, setCurrentPage] = useState<'home' | 'grade' | 'subject' | 'exam'>('home');
   const [selectedGrade, setSelectedGrade] = useState<number | null>(null);
   const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
+  const [selectedExamPaper, setSelectedExamPaper] = useState<any>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -606,6 +699,12 @@ function App() {
     setConversations([newConversation, ...conversations]);
     setActiveConversationId(newConversation.id);
     setSidebarOpen(false);
+    
+    // Reset to home screen when creating new chat
+    setCurrentPage('home');
+    setSelectedGrade(null);
+    setSelectedSubject(null);
+    setSelectedExamPaper(null);
   };
 
   const sendMessage = async () => {
@@ -717,6 +816,39 @@ function App() {
   const goBackToGrade = () => {
     setCurrentPage('grade');
     setSelectedSubject(null);
+    setSelectedExamPaper(null);
+  };
+
+  const openExamStudyMode = (examPaper: any) => {
+    setSelectedExamPaper(examPaper);
+    setCurrentPage('exam');
+    
+    // Create or switch to exam-specific conversation
+    const examConversationTitle = `${selectedSubject} ${examPaper.year} - Study Mode`;
+    let examConversation = conversations.find(c => c.title === examConversationTitle);
+    
+    if (!examConversation) {
+      examConversation = {
+        id: Date.now().toString(),
+        title: examConversationTitle,
+        messages: [{
+          id: Date.now().toString(),
+          text: `Hi! I'm Ruby 🤖 I'm here to help you study for your ${selectedSubject} ${examPaper.year} exam. I can explain any question, help you understand concepts, or guide you through problem-solving steps. What would you like to work on first?`,
+          isUser: false,
+          timestamp: new Date()
+        }],
+        lastUpdated: new Date(),
+        isFavorite: false
+      };
+      setConversations([examConversation, ...conversations]);
+    }
+    
+    setActiveConversationId(examConversation.id);
+  };
+
+  const goBackToSubject = () => {
+    setCurrentPage('subject');
+    setSelectedExamPaper(null);
   };
 
   const downloadExamPaper = (filename: string, title: string, _size: string, pages: number) => {
@@ -1050,7 +1182,7 @@ startxref
                     }`}
                   >
                     <span className="flex items-center justify-between">
-                      {lang.native}
+                    {lang.native}
                       {selectedLanguage.code === lang.code && (
                         <span className="text-white animate-pulse">✓</span>
                       )}
@@ -1062,9 +1194,117 @@ startxref
           </div>
         </div>
 
-        {/* Chat Messages */}
+        {/* Chat Messages or Exam Study Mode */}
         <div className="flex-1 overflow-y-auto p-4">
-          {!activeConversation || activeConversation.messages.length === 0 ? (
+          {currentPage === 'exam' && selectedExamPaper ? (
+            // Exam Study Mode - Split Screen Layout
+            <div className="h-full flex gap-4">
+              {/* Left Side - Exam Paper */}
+              <div className="w-1/2 bg-white rounded-xl shadow-lg p-6 overflow-y-auto">
+                {/* Exam Header */}
+                <div className="border-b pb-4 mb-6">
+                  <button
+                    onClick={goBackToSubject}
+                    className="flex items-center gap-2 text-blue-600 hover:text-blue-800 mb-4 font-medium"
+                  >
+                    <ArrowLeft className="w-4 h-4" />
+                    Back to {selectedSubject}
+                  </button>
+                  <h1 className="text-2xl font-bold text-gray-800 mb-2">{selectedExamPaper.title}</h1>
+                  <div className="text-gray-600">
+                    📄 {selectedExamPaper.pages} pages • {selectedExamPaper.year} • {selectedSubject}
+                  </div>
+                </div>
+
+                {/* Exam Content */}
+                <div className="space-y-6">
+                  {selectedExamPaper.content.sections.map((section: any, sectionIndex: number) => (
+                    <div key={sectionIndex} className="bg-gray-50 rounded-lg p-4">
+                      <h2 className="text-xl font-semibold text-gray-800 mb-4 border-b pb-2">
+                        {section.title}
+                      </h2>
+                      <div className="space-y-4">
+                        {section.questions.map((question: string, questionIndex: number) => (
+                          <div key={questionIndex} className="bg-white p-4 rounded-lg shadow-sm">
+                            <div className="whitespace-pre-line text-gray-700 leading-relaxed">
+                              {question}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Right Side - AI Chat */}
+              <div className="w-1/2 bg-blue-50 rounded-xl shadow-lg flex flex-col">
+                {/* Chat Header */}
+                <div className="bg-blue-600 text-white p-4 rounded-t-xl">
+                  <div className="flex items-center gap-3">
+                    <div className="text-2xl">🤖</div>
+                    <div>
+                      <h2 className="font-semibold">Ruby - Study Assistant</h2>
+                      <p className="text-blue-100 text-sm">{selectedSubject} {selectedExamPaper.year} Exam Help</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Chat Messages */}
+                <div className="flex-1 p-4 overflow-y-auto space-y-4">
+                  {activeConversation?.messages.map((message) => (
+                    <div key={message.id} className={`flex gap-3 ${message.isUser ? 'justify-end' : 'justify-start'}`}>
+                      <div className={`max-w-[80%] p-3 rounded-lg ${
+                        message.isUser 
+                          ? 'bg-blue-600 text-white ml-12' 
+                          : 'bg-white text-gray-800 shadow-sm mr-12'
+                      }`}>
+                        <div className="whitespace-pre-wrap text-sm leading-relaxed">{message.text}</div>
+                        <div className={`text-xs mt-2 ${message.isUser ? 'text-blue-100' : 'text-gray-500'}`}>
+                          {message.timestamp.toLocaleTimeString()}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                  
+                  {isTyping && (
+                    <div className="flex gap-3 justify-start">
+                      <div className="bg-white text-gray-800 shadow-sm p-3 rounded-lg mr-12">
+                        <div className="flex gap-1">
+                          <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+                          <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                          <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  <div ref={messagesEndRef} />
+                </div>
+
+                {/* Chat Input */}
+                <div className="p-4 border-t bg-white rounded-b-xl">
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={currentMessage}
+                      onChange={(e) => setCurrentMessage(e.target.value)}
+                      onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+                      placeholder="Ask Ruby about any question or concept..."
+                      className="w-full bg-gray-50 text-gray-800 placeholder-gray-500 pl-4 pr-12 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm"
+                      disabled={isTyping}
+                    />
+                    <button
+                      onClick={sendMessage}
+                      disabled={!currentMessage.trim() || isTyping}
+                      className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white p-2 rounded-lg transition-colors"
+                    >
+                      <Send className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : !activeConversation || activeConversation.messages.length === 0 ? (
             <div className="h-full flex flex-col items-center justify-center text-center">
               <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 md:p-10 max-w-6xl mx-auto w-full">
                 {/* Home Page */}
@@ -1101,8 +1341,8 @@ startxref
                   <div className="flex items-center gap-3">
                     <Languages className="w-7 h-7 md:w-6 md:h-6" />
                     <span className="font-medium">{t('languages', selectedLanguage.code)}</span>
-                      </div>
-                    </div>
+                  </div>
+                </div>
                   </>
                 )}
 
@@ -1184,13 +1424,22 @@ startxref
                                                         <div className="text-sm text-blue-200 mb-4">
                               📄 {paper.pages} {t('pages', selectedLanguage.code)} • 💾 {paper.size}
                             </div>
-                            <button
-                              onClick={() => downloadExamPaper(paper.filename, paper.title, paper.size, paper.pages)}
-                              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2"
-                            >
-                              <Download className="w-5 h-5" />
-                              {t('downloadPdf', selectedLanguage.code)}
-                            </button>
+                            <div className="flex gap-2">
+                              <button
+                                onClick={() => openExamStudyMode(paper)}
+                                className="flex-1 bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2"
+                              >
+                                <BookOpen className="w-5 h-5" />
+                                Study Mode
+                              </button>
+                              <button
+                                onClick={() => downloadExamPaper(paper.filename, paper.title, paper.size, paper.pages)}
+                                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2"
+                              >
+                                <Download className="w-5 h-5" />
+                                {t('downloadPdf', selectedLanguage.code)}
+                              </button>
+                            </div>
                   </div>
                 </div>
                       )) || (
@@ -1278,14 +1527,14 @@ startxref
                   onChange={(e) => setCurrentMessage(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
                   placeholder={`${t('askRuby', selectedLanguage.code)} ${selectedLanguage.native}...`}
-                  className="w-full bg-white text-gray-800 placeholder-gray-500 pl-6 pr-24 py-5 md:py-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-yellow-400 text-lg md:text-base font-medium"
+                  className="w-full bg-white text-gray-800 placeholder-gray-500 pl-6 pr-32 py-6 md:py-5 rounded-2xl focus:outline-none focus:ring-2 focus:ring-yellow-400 text-lg md:text-base font-medium"
                   disabled={isTyping}
                 />
                 
-                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex gap-2">
+                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex gap-2 items-center">
                   <button
                     onClick={() => fileInputRef.current?.click()}
-                    className="p-3 md:p-2 text-gray-500 hover:text-blue-500 transition-colors text-xl md:text-lg"
+                    className="p-3 md:p-2 text-gray-500 hover:text-blue-500 transition-colors text-3xl md:text-2xl flex items-center justify-center"
                     title="Upload file"
                   >
                     📎
@@ -1293,7 +1542,7 @@ startxref
                   <button
                     onClick={sendMessage}
                     disabled={!currentMessage.trim() || isTyping}
-                    className="p-4 md:p-3 bg-yellow-400 hover:bg-yellow-500 disabled:opacity-50 disabled:cursor-not-allowed text-blue-900 rounded-lg transition-colors"
+                    className="p-3 md:p-2.5 bg-yellow-400 hover:bg-yellow-500 disabled:opacity-50 disabled:cursor-not-allowed text-blue-900 rounded-lg transition-colors flex items-center justify-center"
                   >
                     <Send className="w-6 h-6 md:w-5 md:h-5" />
                   </button>
