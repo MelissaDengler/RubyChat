@@ -1,0 +1,904 @@
+import { useState, useRef, useEffect } from 'react';
+import { Send, Plus, Menu, Settings, Download, Search, Copy, Trash2, Globe, BookOpen, Calculator, Microscope, Languages, Star } from 'lucide-react';
+
+interface Message {
+  id: string;
+  text: string;
+  isUser: boolean;
+  timestamp: Date;
+}
+
+interface Conversation {
+  id: string;
+  title: string;
+  messages: Message[];
+  lastUpdated: Date;
+  isFavorite: boolean;
+}
+
+const SOUTH_AFRICAN_LANGUAGES = [
+  { code: 'en', name: 'English', native: 'English' },
+  { code: 'af', name: 'Afrikaans', native: 'Afrikaans' },
+  { code: 'zu', name: 'isiZulu', native: 'isiZulu' },
+  { code: 'xh', name: 'isiXhosa', native: 'isiXhosa' },
+  { code: 'st', name: 'Sesotho', native: 'Sesotho' },
+  { code: 'nso', name: 'Sepedi', native: 'Sepedi' },
+  { code: 'tn', name: 'Setswana', native: 'Setswana' },
+  { code: 'ss', name: 'siSwati', native: 'siSwati' },
+  { code: 've', name: 'Tshivenda', native: 'Tshivenda' },
+  { code: 'ts', name: 'Xitsonga', native: 'Xitsonga' },
+  { code: 'nr', name: 'isiNdebele', native: 'isiNdebele' }
+];
+
+const GRADE_LEVELS = [
+  { grade: 8, label: "Grade 8", description: "Senior Phase" },
+  { grade: 9, label: "Grade 9", description: "Senior Phase" },
+  { grade: 10, label: "Grade 10", description: "FET Phase" },
+  { grade: 11, label: "Grade 11", description: "FET Phase" },
+  { grade: 12, label: "Grade 12", description: "Matric Year" }
+];
+
+const GRADE_SUBJECTS = {
+  8: ['Mathematics', 'English', 'Natural Sciences', 'Social Sciences', 'Afrikaans', 'Technology', 'Arts and Culture', 'Life Orientation'],
+  9: ['Mathematics', 'English', 'Natural Sciences', 'Social Sciences', 'Afrikaans', 'Technology', 'Arts and Culture', 'Life Orientation'],
+  10: ['Mathematics', 'English', 'Physical Sciences', 'Life Sciences', 'History', 'Geography', 'Afrikaans', 'Business Studies', 'Economics', 'Life Orientation'],
+  11: ['Mathematics', 'English', 'Physical Sciences', 'Life Sciences', 'History', 'Geography', 'Afrikaans', 'Business Studies', 'Economics', 'Accounting', 'Life Orientation'],
+  12: ['Mathematics', 'English', 'Physical Sciences', 'Life Sciences', 'History', 'Geography', 'Afrikaans', 'Business Studies', 'Economics', 'Accounting', 'Life Orientation']
+};
+
+// Mock exam papers with downloadable PDFs
+const generateExamPapers = (grade: number, subject: string) => {
+  const years = [2023, 2022, 2021, 2020, 2019];
+  const suffix = grade === 12 ? ' - NSC' : '';
+  
+  return years.map(year => ({
+    year,
+    title: `Grade ${grade} ${subject} Final Exam ${year}${suffix}`,
+    filename: `grade${grade}_${subject.toLowerCase().replace(/\s+/g, '_')}_${year}.pdf`,
+    size: `${Math.floor(Math.random() * 3 + 1)}.${Math.floor(Math.random() * 9)}MB`,
+    pages: Math.floor(Math.random() * 20 + 8)
+  }));
+};
+
+const EXAM_PAPERS: Record<number, Record<string, Array<{year: number, title: string, filename: string, size: string, pages: number}>>> = {};
+
+// Generate exam papers for all grades and subjects
+[8, 9, 10, 11, 12].forEach(grade => {
+  EXAM_PAPERS[grade] = {};
+  GRADE_SUBJECTS[grade as keyof typeof GRADE_SUBJECTS].forEach(subject => {
+    EXAM_PAPERS[grade][subject] = generateExamPapers(grade, subject);
+  });
+});
+
+function App() {
+  const [conversations, setConversations] = useState<Conversation[]>([
+    {
+      id: '1',
+      title: 'Mathematics Help - Quadratic Equations',
+      messages: [],
+      lastUpdated: new Date(Date.now() - 86400000), // 1 day ago
+      isFavorite: true
+    },
+    {
+      id: '2',
+      title: 'Science Notes - Photosynthesis',
+      messages: [],
+      lastUpdated: new Date(Date.now() - 172800000), // 2 days ago
+      isFavorite: false
+    },
+    {
+      id: '3',
+      title: 'History Essay - Apartheid Timeline',
+      messages: [],
+      lastUpdated: new Date(Date.now() - 259200000), // 3 days ago
+      isFavorite: true
+    }
+  ]);
+  const [activeConversationId, setActiveConversationId] = useState<string>('');
+  const [currentMessage, setCurrentMessage] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [selectedLanguage, setSelectedLanguage] = useState(SOUTH_AFRICAN_LANGUAGES[0]);
+  const [languageMenuOpen, setLanguageMenuOpen] = useState(false);
+  const [sidebarLanguageMenuOpen, setSidebarLanguageMenuOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
+  const [currentPage, setCurrentPage] = useState<'home' | 'grade' | 'subject'>('home');
+  const [selectedGrade, setSelectedGrade] = useState<number | null>(null);
+  const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const activeConversation = conversations.find(c => c.id === activeConversationId);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [activeConversation?.messages]);
+
+  // Close language dropdowns when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      
+      // Check if click is outside language dropdowns
+      if (!target.closest('.language-dropdown')) {
+        setLanguageMenuOpen(false);
+        setSidebarLanguageMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  const createNewConversation = () => {
+    const newConversation: Conversation = {
+      id: Date.now().toString(),
+      title: 'New Conversation',
+      messages: [],
+      lastUpdated: new Date(),
+      isFavorite: false
+    };
+    setConversations([newConversation, ...conversations]);
+    setActiveConversationId(newConversation.id);
+    setSidebarOpen(false);
+  };
+
+  const sendMessage = async () => {
+    if (!currentMessage.trim()) return;
+
+    let conversation = activeConversation;
+    if (!conversation) {
+      const newConversation: Conversation = {
+        id: Date.now().toString(),
+        title: currentMessage.slice(0, 50) + (currentMessage.length > 50 ? '...' : ''),
+        messages: [],
+        lastUpdated: new Date(),
+        isFavorite: false
+      };
+      setConversations([newConversation, ...conversations]);
+      setActiveConversationId(newConversation.id);
+      conversation = newConversation;
+    }
+
+    const userMessage: Message = {
+      id: Date.now().toString(),
+      text: currentMessage,
+      isUser: true,
+      timestamp: new Date()
+    };
+
+    const updatedConversations = conversations.map(c => 
+      c.id === conversation!.id 
+        ? { ...c, messages: [...c.messages, userMessage], lastUpdated: new Date() }
+        : c
+    );
+    
+    if (!activeConversation) {
+      updatedConversations.unshift(conversation);
+    }
+    
+    setConversations(updatedConversations);
+    setCurrentMessage('');
+    setIsTyping(true);
+
+    // Simulate Ruby's response
+    setTimeout(() => {
+      const rubyMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        text: `Hello! I'm Ruby, your AI tutor. I'm here to help you with your studies from Grade 8-12. I can assist with Mathematics, Science, English, History, and many other subjects. What would you like to learn about today? (Currently responding in ${selectedLanguage.native})`,
+        isUser: false,
+        timestamp: new Date()
+      };
+
+      setConversations(prev => prev.map(c => 
+        c.id === conversation!.id 
+          ? { ...c, messages: [...c.messages, rubyMessage] }
+          : c
+      ));
+      setIsTyping(false);
+    }, 2000);
+  };
+
+  const deleteConversation = (id: string) => {
+    setConversations(conversations.filter(c => c.id !== id));
+    if (activeConversationId === id) {
+      setActiveConversationId('');
+    }
+  };
+
+  const exportChat = () => {
+    if (!activeConversation) return;
+    
+    const chatData = {
+      title: activeConversation.title,
+      messages: activeConversation.messages,
+      exportDate: new Date().toISOString()
+    };
+    
+    const blob = new Blob([JSON.stringify(chatData, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `ruby-chat-${activeConversation.title.replace(/[^a-zA-Z0-9]/g, '-')}.json`;
+    a.click();
+  };
+
+  const copyMessage = (text: string) => {
+    navigator.clipboard.writeText(text);
+  };
+
+  const toggleFavorite = (id: string) => {
+    setConversations(conversations.map(c => 
+      c.id === id ? { ...c, isFavorite: !c.isFavorite } : c
+    ));
+  };
+
+  const selectGrade = (grade: number) => {
+    setSelectedGrade(grade);
+    setCurrentPage('grade');
+  };
+
+  const selectSubject = (subject: string) => {
+    setSelectedSubject(subject);
+    setCurrentPage('subject');
+  };
+
+  const goHome = () => {
+    setCurrentPage('home');
+    setSelectedGrade(null);
+    setSelectedSubject(null);
+  };
+
+  const goBackToGrade = () => {
+    setCurrentPage('grade');
+    setSelectedSubject(null);
+  };
+
+  const downloadExamPaper = (filename: string, title: string, _size: string, pages: number) => {
+    // Create mock PDF content
+    const mockPdfContent = `%PDF-1.4
+1 0 obj
+<<
+/Type /Catalog
+/Pages 2 0 R
+>>
+endobj
+
+2 0 obj
+<<
+/Type /Pages
+/Kids [3 0 R]
+/Count 1
+>>
+endobj
+
+3 0 obj
+<<
+/Type /Page
+/Parent 2 0 R
+/MediaBox [0 0 612 792]
+/Contents 4 0 R
+/Resources <<
+/Font <<
+/F1 5 0 R
+>>
+>>
+>>
+endobj
+
+4 0 obj
+<<
+/Length 200
+>>
+stream
+BT
+/F1 24 Tf
+50 750 Td
+(${title}) Tj
+0 -50 Td
+/F1 12 Tf
+(This is a mock exam paper for practice purposes.) Tj
+0 -20 Td
+(Pages: ${pages}) Tj
+0 -20 Td
+(Generated for RubyChat educational platform) Tj
+ET
+endstream
+endobj
+
+5 0 obj
+<<
+/Type /Font
+/Subtype /Type1
+/BaseFont /Helvetica
+>>
+endobj
+
+xref
+0 6
+0000000000 65535 f 
+0000000015 00000 n 
+0000000074 00000 n 
+0000000131 00000 n 
+0000000295 00000 n 
+0000000547 00000 n 
+trailer
+<<
+/Size 6
+/Root 1 0 R
+>>
+startxref
+625
+%%EOF`;
+
+    // Create blob and download
+    const blob = new Blob([mockPdfContent], { type: 'application/pdf' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  const filteredConversations = conversations.filter(c => {
+    const matchesSearch = c.title.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesFavorites = !showFavoritesOnly || c.isFavorite;
+    return matchesSearch && matchesFavorites;
+  });
+
+  return (
+    <div className="min-h-screen bg-blue-500 flex">
+      {/* Sidebar */}
+      <div className={`fixed inset-y-0 left-0 z-50 w-80 bg-blue-600 transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0`}>
+        <div className="flex flex-col h-full">
+          {/* Header */}
+          <div className="p-4 border-b border-blue-500">
+            <div className="flex items-center justify-between mb-4">
+              <h1 className="text-3xl md:text-2xl font-bold text-yellow-400 flex items-center gap-3">
+                <BookOpen className="w-8 h-8 md:w-7 md:h-7" />
+                Ruby Tutor
+              </h1>
+              <button
+                onClick={() => setSidebarOpen(false)}
+                className="lg:hidden text-white hover:text-yellow-400 transition-colors text-3xl w-10 h-10 flex items-center justify-center"
+              >
+                ×
+              </button>
+            </div>
+            <button
+              onClick={createNewConversation}
+              className="w-full bg-yellow-400 hover:bg-yellow-500 text-blue-900 font-semibold px-4 py-4 md:py-3 rounded-lg flex items-center gap-3 transition-colors text-lg md:text-base"
+            >
+              <Plus className="w-6 h-6 md:w-5 md:h-5" />
+              New Chat
+            </button>
+
+            {/* Language Selector - Sidebar */}
+            <div className="mt-3">
+              <div className="relative language-dropdown">
+                <button
+                  onClick={() => setSidebarLanguageMenuOpen(!sidebarLanguageMenuOpen)}
+                  className={`w-full font-semibold px-4 py-3 md:py-2.5 rounded-lg flex items-center justify-between gap-3 transition-all duration-200 text-base md:text-sm border-2 ${
+                    sidebarLanguageMenuOpen 
+                      ? 'bg-blue-600 hover:bg-blue-700 text-white border-blue-500' 
+                      : 'bg-blue-700 hover:bg-blue-600 text-white border-blue-600 hover:border-blue-500'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <Globe className="w-5 h-5 md:w-4 md:h-4" />
+                    <div className="text-left">
+                      <div className="font-semibold">{selectedLanguage.name}</div>
+                      <div className="text-xs text-blue-200 font-normal">{selectedLanguage.native}</div>
+                    </div>
+                  </div>
+                  <div className={`transform transition-transform duration-200 ${sidebarLanguageMenuOpen ? 'rotate-180' : ''}`}>
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                </button>
+                
+                {sidebarLanguageMenuOpen && (
+                  <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-lg shadow-xl border-2 border-blue-200 py-2 z-50">
+                    {SOUTH_AFRICAN_LANGUAGES.map((lang) => (
+                      <button
+                        key={lang.code}
+                        onClick={() => {
+                          setSelectedLanguage(lang);
+                          setSidebarLanguageMenuOpen(false);
+                        }}
+                        className={`w-full text-left px-4 py-2 transition-all duration-200 text-sm font-medium border-l-4 ${
+                          selectedLanguage.code === lang.code 
+                            ? 'bg-blue-50 text-blue-900 border-blue-500 shadow-sm' 
+                            : 'text-gray-700 border-transparent hover:bg-blue-50/50 hover:border-blue-300 hover:text-blue-800'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <div className="font-semibold">{lang.name}</div>
+                            <div className="text-xs opacity-75 mt-0.5">{lang.native}</div>
+                          </div>
+                          {selectedLanguage.code === lang.code && (
+                            <div className="text-blue-600 font-bold text-lg">✓</div>
+                          )}
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Search */}
+          <div className="p-4">
+            <div className="relative mb-4">
+              <Search className="w-6 h-6 md:w-5 md:h-5 absolute left-3 top-3.5 md:top-3 text-blue-300" />
+              <input
+                type="text"
+                placeholder="Search conversations..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full bg-blue-700 text-white placeholder-blue-300 pl-12 md:pl-11 pr-4 py-4 md:py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 text-lg md:text-base"
+              />
+            </div>
+            
+            {/* Favorites Filter */}
+            <button
+              onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
+              className={`w-full flex items-center justify-center gap-3 px-4 py-3 rounded-lg text-lg md:text-base font-semibold transition-colors ${
+                showFavoritesOnly 
+                  ? 'bg-yellow-400 text-blue-900' 
+                  : 'bg-blue-700 text-white hover:bg-blue-800'
+              }`}
+            >
+              <Star className="w-5 h-5 md:w-4 md:h-4" />
+              {showFavoritesOnly ? 'Show All Chats' : 'Show Favorites Only'}
+            </button>
+          </div>
+
+          {/* Conversations */}
+          <div className="flex-1 overflow-y-auto p-4">
+            {filteredConversations.map((conversation) => (
+              <div
+                key={conversation.id}
+                className={`group p-3 mb-2 rounded-lg cursor-pointer transition-colors ${
+                  activeConversationId === conversation.id 
+                    ? 'bg-blue-700 text-white' 
+                    : 'text-blue-100 hover:bg-blue-700'
+                }`}
+                onClick={() => {
+                  setActiveConversationId(conversation.id);
+                  setSidebarOpen(false);
+                }}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <p className="text-lg md:text-base font-semibold truncate">{conversation.title}</p>
+                      {conversation.isFavorite && (
+                        <Star className="w-4 h-4 md:w-3 md:h-3 text-yellow-400 fill-current flex-shrink-0" />
+                      )}
+                    </div>
+                    <p className="text-base md:text-sm text-blue-300">
+                      {conversation.lastUpdated.toLocaleDateString()}
+                    </p>
+                  </div>
+                  <div className="flex gap-2 md:gap-1">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleFavorite(conversation.id);
+                      }}
+                      className={`p-2 md:p-1 rounded transition-colors ${
+                        conversation.isFavorite 
+                          ? 'text-yellow-400 hover:text-yellow-300' 
+                          : 'opacity-0 group-hover:opacity-100 text-blue-300 hover:text-yellow-400'
+                      }`}
+                    >
+                      <Star className="w-5 h-5 md:w-4 md:h-4" />
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        deleteConversation(conversation.id);
+                      }}
+                      className="opacity-0 group-hover:opacity-100 text-blue-300 hover:text-red-400 transition-all p-2 md:p-1"
+                    >
+                      <Trash2 className="w-5 h-5 md:w-4 md:h-4" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Footer */}
+          <div className="p-4 border-t border-blue-500">
+            <div className="flex gap-2">
+              <button
+                onClick={() => setSettingsOpen(true)}
+                className="flex-1 bg-blue-700 hover:bg-blue-800 text-white px-3 py-4 md:py-3 rounded-lg flex items-center justify-center gap-3 transition-colors text-lg md:text-base font-semibold"
+              >
+                <Settings className="w-6 h-6 md:w-5 md:h-5" />
+                Settings
+              </button>
+              <button
+                onClick={exportChat}
+                disabled={!activeConversation}
+                className="flex-1 bg-blue-700 hover:bg-blue-800 disabled:opacity-50 disabled:cursor-not-allowed text-white px-3 py-4 md:py-3 rounded-lg flex items-center justify-center gap-3 transition-colors text-lg md:text-base font-semibold"
+              >
+                <Download className="w-6 h-6 md:w-5 md:h-5" />
+                Export
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col lg:ml-0">
+        {/* Top Bar */}
+        <div className="bg-blue-600 p-4 flex items-center justify-between border-b border-blue-500">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => setSidebarOpen(true)}
+              className="lg:hidden text-white hover:text-yellow-400 transition-colors p-2"
+            >
+              <Menu className="w-8 h-8 md:w-7 md:h-7" />
+            </button>
+            <h2 className="text-white font-semibold text-xl md:text-lg">
+              {activeConversation?.title || 'Ruby Tutor'}
+            </h2>
+          </div>
+          
+          {/* Language Selector */}
+          <div className="relative language-dropdown">
+            <button
+              onClick={() => setLanguageMenuOpen(!languageMenuOpen)}
+              className="bg-blue-700 hover:bg-blue-800 text-white px-4 py-3 md:py-2 rounded-lg flex items-center gap-3 transition-colors text-lg md:text-base font-semibold"
+            >
+              <Globe className="w-6 h-6 md:w-5 md:h-5" />
+              {selectedLanguage.native}
+            </button>
+            
+            {languageMenuOpen && (
+              <div className="absolute right-0 top-12 bg-white rounded-lg shadow-lg border border-gray-200 py-2 w-48 z-50">
+                {SOUTH_AFRICAN_LANGUAGES.map((lang) => (
+                  <button
+                    key={lang.code}
+                    onClick={() => {
+                      setSelectedLanguage(lang);
+                      setLanguageMenuOpen(false);
+                    }}
+                    className={`w-full text-left px-4 py-3 md:py-2 hover:bg-gray-100 transition-colors text-lg md:text-base font-medium ${
+                      selectedLanguage.code === lang.code ? 'bg-blue-50 text-blue-600' : 'text-gray-700'
+                    }`}
+                  >
+                    {lang.native}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Chat Messages */}
+        <div className="flex-1 overflow-y-auto p-4">
+          {!activeConversation || activeConversation.messages.length === 0 ? (
+            <div className="h-full flex flex-col items-center justify-center text-center">
+              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 md:p-10 max-w-6xl mx-auto w-full">
+                {/* Home Page */}
+                {currentPage === 'home' && (
+                  <>
+                    <div className="text-7xl md:text-8xl mb-6">🔴</div>
+                    <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">Hi! I'm Ruby</h2>
+                    <p className="text-blue-100 text-xl md:text-2xl mb-8 md:mb-10 leading-relaxed font-medium">
+                      Your AI tutor for Grades 8-12. I'm here to help you excel in all subjects with personalized support in any of South Africa's 11 official languages.
+                    </p>
+                    
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+                      {GRADE_LEVELS.map((gradeLevel) => (
+                        <button
+                          key={gradeLevel.grade}
+                          onClick={() => selectGrade(gradeLevel.grade)}
+                          className="text-center p-6 md:p-5 bg-white/20 hover:bg-white/30 rounded-xl text-white transition-colors border-2 border-white/30 hover:border-white/50"
+                        >
+                          <div className="text-3xl md:text-2xl font-bold mb-2">{gradeLevel.label}</div>
+                          <div className="text-base md:text-sm text-blue-100 font-medium">{gradeLevel.description}</div>
+                        </button>
+                      ))}
+                    </div>
+                    
+                    <div className="flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-8 text-blue-200 text-lg md:text-base">
+                      <div className="flex items-center gap-3">
+                        <Calculator className="w-7 h-7 md:w-6 md:h-6" />
+                        <span className="font-medium">Mathematics</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <Microscope className="w-7 h-7 md:w-6 md:h-6" />
+                        <span className="font-medium">Sciences</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <Languages className="w-7 h-7 md:w-6 md:h-6" />
+                        <span className="font-medium">Languages</span>
+                      </div>
+                    </div>
+                  </>
+                )}
+
+                {/* Grade Subjects Page */}
+                {currentPage === 'grade' && selectedGrade && (
+                  <>
+                    {/* Breadcrumb Navigation */}
+                    <div className="flex items-center justify-center mb-8">
+                      <button
+                        onClick={goHome}
+                        className="text-blue-300 hover:text-white transition-colors text-lg font-medium"
+                      >
+                        Home
+                      </button>
+                      <span className="text-blue-200 mx-3">→</span>
+                      <span className="text-white text-lg font-medium">Grade {selectedGrade}</span>
+                    </div>
+
+                    <div className="text-6xl md:text-7xl mb-6">📚</div>
+                    <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">Grade {selectedGrade} Subjects</h2>
+                    <p className="text-blue-100 text-xl md:text-2xl mb-8 md:mb-10 leading-relaxed font-medium">
+                      Choose a subject to access past 5 years of exam papers for download
+                    </p>
+                    
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-8">
+                      {GRADE_SUBJECTS[selectedGrade as keyof typeof GRADE_SUBJECTS]?.map((subject) => (
+                        <button
+                          key={subject}
+                          onClick={() => selectSubject(subject)}
+                          className="text-center p-6 md:p-5 bg-white/20 hover:bg-white/30 rounded-xl text-white transition-colors border-2 border-white/30 hover:border-white/50 group"
+                        >
+                          <div className="text-xl md:text-2xl font-bold mb-2 group-hover:text-yellow-200 transition-colors">{subject}</div>
+                          <div className="text-sm text-blue-100 font-medium">5 Past Papers Available</div>
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                )}
+
+                {/* Subject Exam Papers Page */}
+                {currentPage === 'subject' && selectedGrade && selectedSubject && (
+                  <>
+                    {/* Breadcrumb Navigation */}
+                    <div className="flex items-center justify-center mb-8">
+                      <button
+                        onClick={goHome}
+                        className="text-blue-300 hover:text-white transition-colors text-lg font-medium"
+                      >
+                        Home
+                      </button>
+                      <span className="text-blue-200 mx-3">→</span>
+                      <button
+                        onClick={goBackToGrade}
+                        className="text-blue-300 hover:text-white transition-colors text-lg font-medium"
+                      >
+                        Grade {selectedGrade}
+                      </button>
+                      <span className="text-blue-200 mx-3">→</span>
+                      <span className="text-white text-lg font-medium">{selectedSubject}</span>
+                    </div>
+
+                    <div className="text-6xl md:text-7xl mb-6">📄</div>
+                    <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">Grade {selectedGrade} - {selectedSubject}</h2>
+                    <p className="text-blue-100 text-xl md:text-2xl mb-8 md:mb-10 leading-relaxed font-medium">
+                      Download past exam papers (2019-2023) to practice and prepare
+                    </p>
+                    
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                      {EXAM_PAPERS[selectedGrade as keyof typeof EXAM_PAPERS]?.[selectedSubject]?.map((paper) => (
+                        <div
+                          key={`${paper.year}-${selectedSubject}`}
+                          className="bg-white/20 hover:bg-white/30 rounded-xl p-6 border-2 border-white/30 hover:border-white/50 transition-all duration-200 group"
+                        >
+                          <div className="text-center">
+                            <div className="text-3xl font-bold text-yellow-400 mb-3">{paper.year}</div>
+                            <h3 className="text-lg font-semibold text-white mb-2 group-hover:text-yellow-200 transition-colors">
+                              {paper.title}
+                            </h3>
+                            <div className="text-sm text-blue-200 mb-4">
+                              📄 {paper.pages} pages • 💾 {paper.size}
+                            </div>
+                            <button
+                              onClick={() => downloadExamPaper(paper.filename, paper.title, paper.size, paper.pages)}
+                              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2"
+                            >
+                              <Download className="w-5 h-5" />
+                              Download PDF
+                            </button>
+                          </div>
+                        </div>
+                      )) || (
+                        <div className="col-span-full text-center">
+                          <p className="text-blue-200 text-lg">No exam papers available for this subject yet.</p>
+                        </div>
+                      )}
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+          ) : (
+            <div className="max-w-4xl mx-auto">
+              {activeConversation.messages.map((message) => (
+                <div key={message.id} className={`mb-6 flex ${message.isUser ? 'justify-end' : 'justify-start'}`}>
+                  <div className={`max-w-xs md:max-w-2xl ${message.isUser ? 'order-2' : 'order-1'}`}>
+                    <div className={`rounded-2xl px-4 py-3 ${
+                      message.isUser 
+                        ? 'bg-yellow-400 text-blue-900' 
+                        : 'bg-white text-gray-800'
+                    }`}>
+                      <p className="whitespace-pre-wrap text-lg md:text-base leading-relaxed font-medium">{message.text}</p>
+                      <div className="flex items-center justify-between mt-3">
+                        <span className={`text-base md:text-sm font-medium ${message.isUser ? 'text-blue-700' : 'text-gray-500'}`}>
+                          {message.timestamp.toLocaleTimeString()}
+                        </span>
+                        <button
+                          onClick={() => copyMessage(message.text)}
+                          className={`p-2 md:p-1 rounded hover:bg-black/10 transition-colors ${
+                            message.isUser ? 'text-blue-700' : 'text-gray-500'
+                          }`}
+                        >
+                          <Copy className="w-5 h-5 md:w-4 md:h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <div className={`w-12 h-12 md:w-10 md:h-10 rounded-full flex items-center justify-center text-white font-semibold text-base md:text-sm ${
+                    message.isUser 
+                      ? 'bg-yellow-400 text-blue-900 order-1 mr-4 md:mr-3' 
+                      : 'bg-white text-blue-500 order-2 ml-4 md:ml-3'
+                  }`}>
+                    {message.isUser ? 'You' : '🔴'}
+                  </div>
+                </div>
+              ))}
+              
+              {isTyping && (
+                <div className="mb-6 flex justify-start">
+                  <div className="max-w-xs md:max-w-2xl order-1">
+                    <div className="bg-white text-gray-800 rounded-2xl px-4 py-3">
+                      <div className="flex gap-1">
+                        <div className="w-4 h-4 md:w-3 md:h-3 bg-gray-400 rounded-full animate-bounce"></div>
+                        <div className="w-4 h-4 md:w-3 md:h-3 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                        <div className="w-4 h-4 md:w-3 md:h-3 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="w-12 h-12 md:w-10 md:h-10 rounded-full bg-white flex items-center justify-center text-blue-500 order-2 ml-4 md:ml-3 text-base md:text-sm font-semibold">
+                    🔴
+                  </div>
+                </div>
+              )}
+              <div ref={messagesEndRef} />
+            </div>
+          )}
+        </div>
+
+        {/* Input Area */}
+        <div className="p-4 border-t border-blue-400">
+          <div className="max-w-4xl mx-auto">
+            <div className="flex gap-2">
+              <input
+                type="file"
+                ref={fileInputRef}
+                className="hidden"
+                accept=".pdf,.doc,.docx,.txt,.jpg,.png"
+              />
+              
+              <div className="flex-1 relative">
+                <input
+                  type="text"
+                  value={currentMessage}
+                  onChange={(e) => setCurrentMessage(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+                  placeholder={`Ask Ruby anything in ${selectedLanguage.native}...`}
+                  className="w-full bg-white text-gray-800 placeholder-gray-500 pl-6 pr-24 py-5 md:py-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-yellow-400 text-lg md:text-base font-medium"
+                  disabled={isTyping}
+                />
+                
+                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex gap-2">
+                  <button
+                    onClick={() => fileInputRef.current?.click()}
+                    className="p-3 md:p-2 text-gray-500 hover:text-blue-500 transition-colors text-xl md:text-lg"
+                    title="Upload file"
+                  >
+                    📎
+                  </button>
+                  <button
+                    onClick={sendMessage}
+                    disabled={!currentMessage.trim() || isTyping}
+                    className="p-4 md:p-3 bg-yellow-400 hover:bg-yellow-500 disabled:opacity-50 disabled:cursor-not-allowed text-blue-900 rounded-lg transition-colors"
+                  >
+                    <Send className="w-6 h-6 md:w-5 md:h-5" />
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            <p className="text-center text-blue-200 text-lg md:text-base mt-4 md:mt-3 leading-relaxed font-medium">
+              Ruby can help with homework, explain concepts, and provide study support for Grades 8-12
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Settings Modal */}
+      {settingsOpen && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-2xl p-6 max-w-md w-full">
+            <div className="flex items-center justify-between mb-8">
+              <h3 className="text-2xl md:text-xl font-bold text-gray-800">Settings</h3>
+              <button
+                onClick={() => setSettingsOpen(false)}
+                className="text-gray-500 hover:text-gray-700 text-3xl w-12 h-12 md:w-10 md:h-10 flex items-center justify-center"
+              >
+                ×
+              </button>
+            </div>
+            
+            <div className="space-y-8 md:space-y-6">
+              <div>
+                <label className="block text-lg md:text-base font-semibold text-gray-700 mb-4 md:mb-3">
+                  Preferred Language
+                </label>
+                <select
+                  value={selectedLanguage.code}
+                  onChange={(e) => setSelectedLanguage(SOUTH_AFRICAN_LANGUAGES.find(l => l.code === e.target.value)!)}
+                  className="w-full border border-gray-300 rounded-lg px-4 py-4 md:py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg md:text-base font-medium"
+                >
+                  {SOUTH_AFRICAN_LANGUAGES.map((lang) => (
+                    <option key={lang.code} value={lang.code}>
+                      {lang.native}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              
+              <div>
+                <h4 className="text-lg md:text-base font-semibold text-gray-700 mb-4 md:mb-3">About Ruby</h4>
+                <div className="bg-blue-50 rounded-lg p-5 md:p-4 text-lg md:text-base text-blue-800 leading-relaxed">
+                  <p className="mb-3 md:mb-2 font-medium">
+                    <strong>Ruby AI Tutor</strong> - Designed specifically for South African students in Grades 8-12.
+                  </p>
+                  <p className="mb-3 md:mb-2">
+                    • Supports all 11 official languages
+                  </p>
+                  <p className="mb-3 md:mb-2">
+                    • Covers all major subjects
+                  </p>
+                  <p>
+                    • Provides personalized learning support
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Overlay for mobile sidebar */}
+      {sidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+    </div>
+  );
+}
+
+export default App;
