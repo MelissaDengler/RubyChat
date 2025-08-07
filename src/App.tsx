@@ -867,7 +867,7 @@ startxref
                 </button>
                 
                 {sidebarLanguageMenuOpen && (
-                  <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-lg shadow-xl border-2 border-blue-200 py-2 z-50">
+                  <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-2xl border-2 border-blue-200 py-3 z-50 backdrop-blur-sm">
                     {SOUTH_AFRICAN_LANGUAGES.map((lang) => (
                       <button
                         key={lang.code}
@@ -875,19 +875,23 @@ startxref
                           setSelectedLanguage(lang);
                           setSidebarLanguageMenuOpen(false);
                         }}
-                        className={`w-full text-left px-4 py-2 transition-all duration-200 text-sm font-medium border-l-4 ${
+                        className={`w-full text-left px-4 py-3 transition-all duration-300 text-sm font-medium border-l-4 group ${
                           selectedLanguage.code === lang.code 
-                            ? 'bg-blue-50 text-blue-900 border-blue-500 shadow-sm' 
-                            : 'text-gray-700 border-transparent hover:bg-blue-50/50 hover:border-blue-300 hover:text-blue-800'
+                            ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white border-blue-400 shadow-lg transform scale-[1.02] mx-1 rounded-lg' 
+                            : 'text-gray-700 border-transparent hover:bg-gradient-to-r hover:from-blue-50 hover:to-blue-100 hover:border-blue-400 hover:text-blue-800 hover:shadow-md hover:transform hover:scale-[1.01] hover:mx-1 hover:rounded-lg'
                         }`}
                       >
                         <div className="flex items-center justify-between">
                           <div>
-                            <div className="font-semibold">{lang.name}</div>
-                            <div className="text-xs opacity-75 mt-0.5">{lang.native}</div>
+                            <div className={`font-semibold ${selectedLanguage.code === lang.code ? 'text-white' : 'group-hover:text-blue-800'}`}>
+                              {lang.name}
+                            </div>
+                            <div className={`text-xs mt-0.5 ${selectedLanguage.code === lang.code ? 'text-blue-100' : 'opacity-75 group-hover:text-blue-700'}`}>
+                              {lang.native}
+                            </div>
                           </div>
                           {selectedLanguage.code === lang.code && (
-                            <div className="text-blue-600 font-bold text-lg">✓</div>
+                            <div className="text-white font-bold text-lg animate-pulse">✓</div>
                           )}
                         </div>
                       </button>
@@ -1031,7 +1035,7 @@ startxref
             </button>
             
             {languageMenuOpen && (
-              <div className="absolute right-0 top-12 bg-white rounded-lg shadow-lg border border-gray-200 py-2 w-48 z-50">
+              <div className="absolute right-0 top-12 bg-white rounded-xl shadow-2xl border border-blue-200 py-3 w-48 z-50 backdrop-blur-sm">
                 {SOUTH_AFRICAN_LANGUAGES.map((lang) => (
                   <button
                     key={lang.code}
@@ -1039,11 +1043,18 @@ startxref
                       setSelectedLanguage(lang);
                       setLanguageMenuOpen(false);
                     }}
-                    className={`w-full text-left px-4 py-3 md:py-2 hover:bg-gray-100 transition-colors text-lg md:text-base font-medium ${
-                      selectedLanguage.code === lang.code ? 'bg-blue-50 text-blue-600' : 'text-gray-700'
+                    className={`w-full text-left px-4 py-3 md:py-2 transition-all duration-200 text-lg md:text-base font-medium group ${
+                      selectedLanguage.code === lang.code 
+                        ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md transform scale-[1.02] mx-2 rounded-lg' 
+                        : 'text-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-blue-100 hover:text-blue-700 hover:shadow-sm hover:transform hover:scale-[1.01] hover:mx-2 hover:rounded-lg'
                     }`}
                   >
-                    {lang.native}
+                    <span className="flex items-center justify-between">
+                      {lang.native}
+                      {selectedLanguage.code === lang.code && (
+                        <span className="text-white animate-pulse">✓</span>
+                      )}
+                    </span>
                   </button>
                 ))}
               </div>
@@ -1059,7 +1070,7 @@ startxref
                 {/* Home Page */}
                 {currentPage === 'home' && (
                   <>
-                    <div className="text-7xl md:text-8xl mb-6">🔴</div>
+                    <div className="text-7xl md:text-8xl mb-6">🤖</div>
                                         <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">{t('hiRuby', selectedLanguage.code)}</h2>
                     <p className="text-blue-100 text-xl md:text-2xl mb-8 md:mb-10 leading-relaxed font-medium">
                       {t('rubyDescription', selectedLanguage.code)}
@@ -1223,7 +1234,7 @@ startxref
                       ? 'bg-yellow-400 text-blue-900 order-1 mr-4 md:mr-3' 
                       : 'bg-white text-blue-500 order-2 ml-4 md:ml-3'
                   }`}>
-                    {message.isUser ? t('you', selectedLanguage.code) : '🔴'}
+                    {message.isUser ? t('you', selectedLanguage.code) : '🤖'}
                   </div>
                 </div>
               ))}
@@ -1240,7 +1251,7 @@ startxref
                     </div>
                   </div>
                   <div className="w-12 h-12 md:w-10 md:h-10 rounded-full bg-white flex items-center justify-center text-blue-500 order-2 ml-4 md:ml-3 text-base md:text-sm font-semibold">
-                    🔴
+                    🤖
                   </div>
                 </div>
               )}
